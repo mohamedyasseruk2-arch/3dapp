@@ -447,12 +447,16 @@ const AppController = {
     });
   },
 
-  playAnim(){
+ playAnim(){
     if(AppModel.actions.length){
-      const a=AppModel.actions[0];a.reset();a.setLoop(THREE.LoopOnce);a.clampWhenFinished=true;a.play();
+      const a=AppModel.actions[0];
+      if(a.isRunning()){a.stop();}
+      a.reset();a.setLoop(THREE.LoopOnce);a.clampWhenFinished=true;a.play();
     } else if(AppModel.loadedModel){
+      if(AppModel._animRunning)return;
+      AppModel._animRunning=true;
       let t=0;const sy=AppModel.loadedModel.scale.y;
-      const id=setInterval(()=>{t+=.08;AppModel.loadedModel.scale.y=sy*(1+Math.sin(t)*.08);if(t>Math.PI*2){AppModel.loadedModel.scale.y=sy;clearInterval(id);}},16);
+      const id=setInterval(()=>{t+=.08;AppModel.loadedModel.scale.y=sy*(1+Math.sin(t)*.08);if(t>Math.PI*2){AppModel.loadedModel.scale.y=sy;clearInterval(id);AppModel._animRunning=false;}},16);
     }
   },
 
