@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>3D Viewer — FORM.</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/dat-gui/0.7.9/dat.gui.min.js"></script>
+  <style>
+    :root {
+      --silver-100:#F4F4F5;--silver-200:#E4E4E7;--silver-300:#D1D1D6;
+      --silver-400:#A1A1AA;--silver-500:#71717A;--silver-600:#52525B;
+      --silver-700:#3F3F46;--silver-800:#27272A;--silver-900:#18181B;
+      --chrome:#C8C8D0;--gold-hint:#B8A98A;
+      --bg:#0C0C0E;--surface:#131316;--surface-2:#1A1A1F;
+      --border:rgba(255,255,255,0.06);--border-2:rgba(255,255,255,0.10);
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    html,body{height:100%;background:var(--bg);color:var(--silver-100);font-family:'Outfit',sans-serif;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+
+    /* NAV */
+    .nav{height:52px;background:rgba(12,12,14,.92);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 32px;position:sticky;top:0;z-index:200}
+    .nav-logo{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:600;letter-spacing:.1em;color:var(--silver-100);text-decoration:none}
+    .nav-logo em{font-style:italic;color:var(--chrome)}
+    .nav-links{display:flex;gap:28px;list-style:none}
+    .nav-links a{font-size:11px;font-weight:400;letter-spacing:.16em;text-transform:uppercase;color:var(--silver-500);text-decoration:none;transition:color .2s}
+    .nav-links a:hover,.nav-links a.active{color:var(--silver-100)}
+
+    /* VIEWER LAYOUT — matches video: full canvas with top bar */
+    .viewer-wrap{display:flex;flex-direction:column;height:calc(100vh - 52px)}
+
+    /* TOP BAR — pill buttons like the video */
+    .top-bar{
+      display:flex;align-items:center;justify-content:center;gap:8px;
+      padding:12px 24px;
+      background:var(--surface);
+      border-bottom:1px solid var(--border);
+      flex-wrap:wrap;
+    }
+    .top-bar-group{display:flex;align-items:center;gap:6px}
+    .top-bar-divider{width:1px;height:20px;background:var(--border-2);margin:0 4px}
+
+    /* pill buttons — exactly like the video */
+    .pill-btn{
+      padding:7px 18px;
+      border-radius:999px;
+      border:1px solid var(--border-2);
+      background:transparent;
+      color:var(--silver-400);
+      font-family:'Outfit',sans-serif;
+      font-size:13px;font-weight:400;
+      letter-spacing:.02em;
+      cursor:pointer;
+      transition:all .2s;
+      outline:none;
+      white-space:nowrap;
+    }
+    .pill-btn:hover{border-color:var(--silver-500);color:var(--silver-100);background:rgba(255,255,255,.04)}
+    .pill-btn.active{background:var(--chrome);border-color:var(--chrome);color:var(--silver-900);font-weight:500}
+    .pill-btn.active-dark{background:var(--silver-800);border-color:var(--silver-700);color:var(--silver-100)}
+
+    /* CANVAS AREA */
+    .canvas-wrap{position:relative;flex:1;background:#000;overflow:hidden}
+    #three-canvas{width:100%!important;height:100%!important;display:block}
+
+    /* LOADING */
+    .loading{position:absolute;inset:0;background:#000;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:10;transition:opacity .5s}
+    .loading.hidden{opacity:0;pointer-events:none}
+    .loading-ring{width:36px;height:36px;border:1px solid rgba(200,200,208,.15);border-top-color:var(--chrome);border-radius:50%;animation:spin .8s linear infinite;margin-bottom:14px}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .loading-text{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--silver-600)}
+    .loading-pct{font-size:11px;letter-spacing:.1em;color:var(--silver-500);margin-top:4px}
+
+    /* ERROR */
+    .error-box{position:absolute;inset:0;background:#000;display:none;flex-direction:column;align-items:center;justify-content:center;z-index:10;color:var(--silver-600);font-size:13px;text-align:center;padding:40px;line-height:1.8}
+    .error-box.show{display:flex}
+
+    /* dat.GUI */
+    #gui-container{position:absolute;top:16px;right:16px;z-index:20}
+
+    /* BOTTOM BAR — product name + hint like the video */
+    .bottom-bar{
+      background:var(--surface);
+      border-top:1px solid var(--border);
+      padding:14px 24px;
+      display:flex;align-items:center;justify-content:space-between;
+      flex-wrap:wrap;gap:8px;
+    }
+    .bottom-product{font-family:'Cormorant Garamond',serif;font-size:17px;font-weight:400;letter-spacing:.04em;color:var(--silver-100)}
+    .bottom-anim{font-size:12px;font-weight:400;color:var(--chrome);letter-spacing:.08em}
+    .bottom-hint{font-size:11px;color:var(--silver-600);letter-spacing:.1em;text-align:right}
+
+    /* SIDE PANEL (hidden by default, toggle with info btn) */
+    .side-panel{
+      position:absolute;top:0;right:0;bottom:0;width:280px;
+      background:rgba(19,19,22,.96);backdrop-filter:blur(16px);
+      border-left:1px solid var(--border);
+      padding:24px 20px;overflow-y:auto;
+      transform:translateX(100%);transition:transform .3s ease;
+      z-index:15;
+    }
+    .side-panel.open{transform:translateX(0)}
+    .panel-section{margin-bottom:24px}
+    .panel-label{font-size:10px;font-weight:500;letter-spacing:.22em;text-transform:uppercase;color:var(--silver-600);margin-bottom:10px}
+    .panel-name{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:400;color:var(--silver-100);margin-bottom:4px}
+    .panel-sub{font-size:12px;color:var(--chrome);margin-bottom:10px;letter-spacing:.05em}
+    .panel-desc{font-size:13px;font-weight:300;color:var(--silver-500);line-height:1.7}
+    .specs-row{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--border);font-size:12px}
+    .specs-row:last-child{border-bottom:none}
+    .specs-key{color:var(--silver-600)}
+    .specs-val{color:var(--silver-200);font-weight:500}
+
+    /* FOOTER */
+    .viewer-footer{background:var(--surface);border-top:1px solid var(--border);padding:10px 32px;display:flex;align-items:center;justify-content:space-between;font-size:11px;color:var(--silver-600)}
+    .viewer-footer a{color:var(--chrome);text-decoration:none}
+
+    @media(max-width:768px){
+      .nav{padding:0 16px}
+      .side-panel{width:100%}
+      .bottom-hint{display:none}
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <a href="index.html" class="nav-logo">FORM<em>.</em></a>
+  <ul class="nav-links">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="viewer.html" class="active">3D Viewer</a></li>
+    <li><a href="about.html">About</a></li>
+  </ul>
+</nav>
+
+<div class="viewer-wrap">
+
+  <!-- TOP BAR — pill buttons like video -->
+  <div class="top-bar">
+    <!-- Product selectors -->
+    <div class="top-bar-group" id="product-tabs"></div>
+
+    <div class="top-bar-divider"></div>
+
+    <!-- Controls -->
+    <div class="top-bar-group">
+      <button class="pill-btn" id="btn-anim"   onclick="AppController.playAnim()">▶ Animate</button>
+      <button class="pill-btn" id="btn-wire"   onclick="AppController.toggleWire()">Wireframe</button>
+      <button class="pill-btn" id="btn-rotate" onclick="AppController.toggleRotate()">Auto-rotate</button>
+    </div>
+
+    <div class="top-bar-divider"></div>
+
+    <!-- More controls -->
+    <div class="top-bar-group">
+      <button class="pill-btn" id="btn-spot"  onclick="AppController.toggleSpot()">💡 Light</button>
+      <button class="pill-btn" id="btn-gui"   onclick="AppController.toggleGUI()">🎛 Lighting</button>
+      <button class="pill-btn"                onclick="AppController.resetCam()">Reset</button>
+      <button class="pill-btn" id="btn-info"  onclick="AppController.togglePanel()">Info</button>
+    </div>
+
+    <div class="top-bar-divider"></div>
+
+    <!-- Camera -->
+    <div class="top-bar-group">
+      <button class="pill-btn" onclick="AppController.camFront()">Front</button>
+      <button class="pill-btn" onclick="AppController.camSide()">Side</button>
+      <button class="pill-btn" onclick="AppController.camTop()">Top</button>
+    </div>
+  </div>
+
+  <!-- CANVAS -->
+  <div class="canvas-wrap">
+    <canvas id="three-canvas"></canvas>
+
+    <div class="loading" id="loading">
+      <div class="loading-ring"></div>
+      <div class="loading-text">Loading model</div>
+      <div class="loading-pct" id="loading-pct"></div>
+    </div>
+
+    <div class="error-box" id="error-box">
+      Model could not be loaded.<br>
+      Ensure .glb files are in the <code>models/</code> folder<br>
+      and named correctly.
+    </div>
+
+    <div id="gui-container"></div>
+
+    <!-- SIDE INFO PANEL -->
+    <div class="side-panel" id="side-panel">
+      <div class="panel-section">
+        <div class="panel-label">Product</div>
+        <div class="panel-name" id="p-name">—</div>
+        <div class="panel-sub" id="p-sub">—</div>
+        <div class="panel-desc" id="p-desc">—</div>
+      </div>
+      <div class="panel-section">
+        <div class="panel-label">Specifications</div>
+        <div id="p-specs"></div>
+      </div>
+      <div class="panel-section">
+        <div class="panel-label">Model Info</div>
+        <div class="specs-row"><span class="specs-key">Renderer</span><span class="specs-val">Three.js r128</span></div>
+        <div class="specs-row"><span class="specs-key">Format</span><span class="specs-val" id="p-format">glTF 2.0</span></div>
+        <div class="specs-row"><span class="specs-key">Animation</span><span class="specs-val" id="p-anim">—</span></div>
+        <div class="specs-row"><span class="specs-key">Geometry</span><span class="specs-val" id="p-geom">—</span></div>
+      </div>
+      <div class="panel-section">
+        <div class="panel-label">Controls</div>
+        <div class="specs-row"><span class="specs-key">Rotate</span><span class="specs-val">Drag</span></div>
+        <div class="specs-row"><span class="specs-key">Zoom</span><span class="specs-val">Scroll</span></div>
+        <div class="specs-row"><span class="specs-key">Pan</span><span class="specs-val">Right drag</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BOTTOM BAR — like the video -->
+  <div class="bottom-bar">
+    <div>
+      <span class="bottom-product" id="bottom-name">iPhone 15 Pro</span>
+      <span style="color:var(--silver-600);margin:0 8px">·</span>
+      <span class="bottom-anim" id="bottom-anim">screen glow</span>
+    </div>
+    <div class="bottom-hint">drag = rotate · scroll = zoom · right-drag = pan</div>
+  </div>
+
+</div>
+
+<footer class="viewer-footer">
+  <span>FORM. · University of Sussex · 3D Applications · 2026</span>
+  <a href="about.html">About this project</a>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+// ══════════════════════════════════════════
+// MODEL — MVC data layer
+// ══════════════════════════════════════════
+const AppModel = {
+  products: [],
+  currentId: null,
+  scene:null, camera:null, renderer:null, controls:null, clock:null,
+  loadedModel:null, mixer:null, actions:[],
+  lights:{ambient:null,key:null,fill:null,rim:null,spot:null},
+  gui:null, sound:null,
+  state:{wire:false,rotating:false,spotOn:false,guiVisible:false,panelOpen:false},
+  gp:{spotOn:false,spotColour:'#e8e8f0',spotIntensity:3,spotAngle:.4,spotMoving:false,ambientInt:.7},
+
+  loadProducts(cb){
+    const xhr=new XMLHttpRequest();
+    xhr.open('GET','products.json',true);
+    xhr.onload=()=>{
+      try{ const d=JSON.parse(xhr.responseText); AppModel.products=d.products; cb(d.products); }
+      catch(e){ cb(AppModel.fallback); }
+    };
+    xhr.onerror=()=>cb(AppModel.fallback);
+    xhr.send();
+  },
+
+  fallback:[
+    {id:'iphone', name:'iPhone 15 Pro',   tagline:'Titanium. So strong. So light.',  sub:'6.1" · A17 Pro · Titanium',  desc:'The most advanced iPhone ever made. Aerospace-grade titanium design with A17 Pro chip.',  specs:[{l:'Chip',v:'A17 Pro'},{l:'Display',v:'6.1" OLED'},{l:'Material',v:'Titanium'},{l:'Camera',v:'48MP Main'}], model:'models/iphone_15_pro.glb',  anim:'screen glow',   geom:'High detail — 23 meshes', format:'glTF 2.0 (.glb)'},
+    {id:'airpods',name:'AirPods Pro 2',   tagline:'Adaptive Audio. Now playing.',     sub:'2nd Gen · H2 Chip',           desc:'AirPods Pro with Adaptive Audio and Active Noise Cancellation. H2 chip inside.',             specs:[{l:'Chip',v:'Apple H2'},{l:'ANC',v:'Active Noise Cancel'},{l:'Battery',v:'30 hours'},{l:'Case',v:'MagSafe'}],     model:'models/airpods_pro.glb',   anim:'open lid',      geom:'High detail — 10 meshes', format:'glTF 2.0 (.glb)'},
+    {id:'watch',  name:'Apple Watch S7',  tagline:'The watch that watches for you.', sub:'45mm · Midnight Aluminium',   desc:'Always-on Retina display with surgical-grade aluminium. The most durable Apple Watch.',     specs:[{l:'Display',v:'Always-On Retina'},{l:'Case',v:'Aluminium'},{l:'Size',v:'45mm'},{l:'Water',v:'50m resist'}],    model:'models/apple_watch.glb',   anim:'360° spin',     geom:'High detail — 12 meshes', format:'glTF 2.0 (.glb)'}
+  ],
+  get(id){return this.products.find(p=>p.id===id);}
+};
+
+// ══════════════════════════════════════════
+// VIEW — MVC presentation layer
+// ══════════════════════════════════════════
+const AppView = {
+  buildTabs(products){
+    const icons={iphone:'📱',airpods:'🎧',watch:'⌚'};
+    document.getElementById('product-tabs').innerHTML=products.map((p,i)=>
+      `<button class="pill-btn${i===0?' active':''}" id="tab-${p.id}" onclick="AppController.switch('${p.id}')">${icons[p.id]||''} ${p.name}</button>`
+    ).join('');
+  },
+  updateInfo(p){
+    // bottom bar
+    document.getElementById('bottom-name').textContent=p.name;
+    document.getElementById('bottom-anim').textContent=p.anim||'';
+    // side panel
+    document.getElementById('p-name').textContent=p.name;
+    document.getElementById('p-sub').textContent=p.tagline||p.sub;
+    document.getElementById('p-desc').textContent=p.desc;
+    document.getElementById('p-format').textContent=p.format;
+    document.getElementById('p-anim').textContent=p.anim;
+    document.getElementById('p-geom').textContent=p.geom;
+    const specs=p.specs||[];
+    document.getElementById('p-specs').innerHTML=specs.map(s=>
+      `<div class="specs-row"><span class="specs-key">${s.l}</span><span class="specs-val">${s.v}</span></div>`
+    ).join('');
+  },
+  setTab(id){
+    document.querySelectorAll('.pill-btn[id^="tab-"]').forEach(t=>t.classList.remove('active'));
+    const t=document.getElementById(`tab-${id}`);
+    if(t)t.classList.add('active');
+  },
+  showLoad(show,pct){
+    document.getElementById('loading').classList.toggle('hidden',!show);
+    if(pct!==undefined)document.getElementById('loading-pct').textContent=pct;
+  },
+  showError(show){document.getElementById('error-box').classList.toggle('show',show);},
+  pill(id,on){const b=document.getElementById(id);if(b)b.classList.toggle('active-dark',on);},
+  resetPills(){['btn-wire','btn-rotate','btn-spot','btn-gui','btn-info'].forEach(id=>AppView.pill(id,false));}
+};
+
+// ══════════════════════════════════════════
+// CONTROLLER — MVC logic layer
+// ══════════════════════════════════════════
+const AppController = {
+  init(){
+    this._three();
+    this._lights();
+    this._gui();
+    AppModel.loadProducts(products=>{
+      AppView.buildTabs(products);
+      const url=new URLSearchParams(window.location.search).get('product');
+      this.switch(url&&AppModel.get(url)?url:products[0].id);
+    });
+    this._loop();
+  },
+
+  _three(){
+    const canvas=document.getElementById('three-canvas');
+    const wrap=canvas.parentElement;
+    AppModel.scene=new THREE.Scene();
+    AppModel.scene.background=new THREE.Color(0x000000);
+    AppModel.camera=new THREE.PerspectiveCamera(40,wrap.clientWidth/wrap.clientHeight,.01,100);
+    AppModel.camera.position.set(0,.5,5);
+    AppModel.renderer=new THREE.WebGLRenderer({canvas,antialias:true});
+    AppModel.renderer.setPixelRatio(window.devicePixelRatio);
+    AppModel.renderer.setSize(wrap.clientWidth,wrap.clientHeight);
+    AppModel.renderer.outputEncoding=THREE.sRGBEncoding;
+    AppModel.renderer.shadowMap.enabled=true;
+    AppModel.renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+    AppModel.renderer.toneMapping=THREE.ACESFilmicToneMapping;
+    AppModel.renderer.toneMappingExposure=1.1;
+    AppModel.controls=new THREE.OrbitControls(AppModel.camera,AppModel.renderer.domElement);
+    AppModel.controls.enableDamping=true;
+    AppModel.controls.dampingFactor=.05;
+    AppModel.controls.minDistance=1;
+    AppModel.controls.maxDistance=20;
+    AppModel.clock=new THREE.Clock();
+    window.addEventListener('resize',()=>{
+      const w=wrap.clientWidth,h=wrap.clientHeight;
+      AppModel.camera.aspect=w/h;
+      AppModel.camera.updateProjectionMatrix();
+      AppModel.renderer.setSize(w,h);
+    });
+  },
+
+  _lights(){
+    const s=AppModel.scene;
+    AppModel.lights.ambient=new THREE.HemisphereLight(0xffffff,0x111111,.7);
+    s.add(AppModel.lights.ambient);
+    AppModel.lights.key=new THREE.DirectionalLight(0xffffff,2);
+    AppModel.lights.key.position.set(3,6,5);
+    AppModel.lights.key.castShadow=true;
+    s.add(AppModel.lights.key);
+    AppModel.lights.fill=new THREE.DirectionalLight(0x99aacc,.4);
+    AppModel.lights.fill.position.set(-4,2,-2);
+    s.add(AppModel.lights.fill);
+    AppModel.lights.rim=new THREE.DirectionalLight(0xd0d0e0,.6);
+    AppModel.lights.rim.position.set(0,-3,-5);
+    s.add(AppModel.lights.rim);
+    AppModel.lights.spot=new THREE.SpotLight(0xe8e8f0,0);
+    AppModel.lights.spot.position.set(0,8,2);
+    AppModel.lights.spot.angle=Math.PI/8;
+    AppModel.lights.spot.penumbra=.3;
+    AppModel.lights.spot.castShadow=true;
+    s.add(AppModel.lights.spot);
+  },
+
+  _gui(){
+    const gp=AppModel.gp;
+    const gui=new dat.GUI({autoPlace:false,width:185});
+    document.getElementById('gui-container').appendChild(gui.domElement);
+    gui.domElement.style.display='none';
+    AppModel.gui=gui;
+    const sf=gui.addFolder('Spotlight');sf.open();
+    sf.add(gp,'spotOn').name('Enable').onChange(v=>{AppModel.lights.spot.intensity=v?gp.spotIntensity:0;AppModel.state.spotOn=v;});
+    sf.addColor(gp,'spotColour').name('Colour').onChange(v=>{AppModel.lights.spot.color=new THREE.Color(v);});
+    sf.add(gp,'spotIntensity',0,8).name('Intensity').onChange(v=>{if(AppModel.state.spotOn)AppModel.lights.spot.intensity=v;});
+    sf.add(gp,'spotAngle',.1,1.5).name('Angle').onChange(v=>{AppModel.lights.spot.angle=v;});
+    sf.add(gp,'spotMoving').name('Animate');
+    const af=gui.addFolder('Ambient');
+    af.add(gp,'ambientInt',0,3).name('Intensity').onChange(v=>{AppModel.lights.ambient.intensity=v;});
+  },
+
+  switch(id){
+    if(id===AppModel.currentId)return;
+    AppModel.currentId=id;
+    const p=AppModel.get(id);
+    if(!p)return;
+    AppView.setTab(id);
+    AppView.updateInfo(p);
+    AppView.resetPills();
+    AppModel.state.wire=false;
+    AppModel.state.rotating=false;
+    AppModel.controls.autoRotate=false;
+    document.getElementById('btn-wire').classList.remove('active-dark');
+    document.getElementById('btn-rotate').classList.remove('active-dark');
+    this._load(p.model);
+  },
+
+  _load(path){
+    AppView.showLoad(true,'');
+    AppView.showError(false);
+    if(AppModel.loadedModel){AppModel.scene.remove(AppModel.loadedModel);AppModel.loadedModel=null;AppModel.mixer=null;AppModel.actions=[];}
+    const loader=new THREE.GLTFLoader();
+    loader.load(path,gltf=>{
+      const m=gltf.scene;
+      const box=new THREE.Box3().setFromObject(m);
+      const centre=box.getCenter(new THREE.Vector3());
+      const size=box.getSize(new THREE.Vector3());
+      const scale=3/Math.max(size.x,size.y,size.z);
+      m.scale.setScalar(scale);
+      m.position.sub(centre.multiplyScalar(scale));
+      m.castShadow=true; m.receiveShadow=true;
+      AppModel.scene.add(m);
+      AppModel.loadedModel=m;
+      if(gltf.animations&&gltf.animations.length){
+        AppModel.mixer=new THREE.AnimationMixer(m);
+        gltf.animations.forEach(c=>AppModel.actions.push(AppModel.mixer.clipAction(c)));
+      }
+      this._wire(AppModel.state.wire);
+      AppView.showLoad(false);
+    },xhr=>{
+      if(xhr.total>0)AppView.showLoad(true,Math.round(xhr.loaded/xhr.total*100)+'%');
+    },err=>{
+      console.error(err);
+      AppView.showLoad(false);
+      AppView.showError(true);
+    });
+  },
+
+  _wire(state){
+    if(!AppModel.loadedModel)return;
+    AppModel.loadedModel.traverse(c=>{
+      if(c.isMesh)(Array.isArray(c.material)?c.material:[c.material]).forEach(m=>m.wireframe=state);
+    });
+  },
+
+  playAnim(){
+    if(AppModel.actions.length){
+      const a=AppModel.actions[0];a.reset();a.setLoop(THREE.LoopOnce);a.clampWhenFinished=true;a.play();
+    } else if(AppModel.loadedModel){
+      let t=0;const sy=AppModel.loadedModel.scale.y;
+      const id=setInterval(()=>{t+=.08;AppModel.loadedModel.scale.y=sy*(1+Math.sin(t)*.08);if(t>Math.PI*2){AppModel.loadedModel.scale.y=sy;clearInterval(id);}},16);
+    }
+  },
+
+  toggleWire(){
+    AppModel.state.wire=!AppModel.state.wire;
+    this._wire(AppModel.state.wire);
+    document.getElementById('btn-wire').classList.toggle('active-dark',AppModel.state.wire);
+  },
+
+  toggleRotate(){
+    AppModel.state.rotating=!AppModel.state.rotating;
+    AppModel.controls.autoRotate=AppModel.state.rotating;
+    AppModel.controls.autoRotateSpeed=1.5;
+    document.getElementById('btn-rotate').classList.toggle('active-dark',AppModel.state.rotating);
+  },
+
+  resetCam(){AppModel.camera.position.set(0,.5,5);AppModel.controls.target.set(0,0,0);AppModel.controls.update();},
+  camFront(){AppModel.camera.position.set(0,0,5);AppModel.controls.target.set(0,0,0);AppModel.controls.update();},
+  camSide(){AppModel.camera.position.set(5,.5,0);AppModel.controls.target.set(0,0,0);AppModel.controls.update();},
+  camTop(){AppModel.camera.position.set(0,6,.01);AppModel.controls.target.set(0,0,0);AppModel.controls.update();},
+
+  toggleSpot(){
+    AppModel.state.spotOn=!AppModel.state.spotOn;
+    AppModel.gp.spotOn=AppModel.state.spotOn;
+    AppModel.lights.spot.intensity=AppModel.state.spotOn?AppModel.gp.spotIntensity:0;
+    document.getElementById('btn-spot').classList.toggle('active-dark',AppModel.state.spotOn);
+  },
+
+  toggleGUI(){
+    AppModel.state.guiVisible=!AppModel.state.guiVisible;
+    AppModel.gui.domElement.style.display=AppModel.state.guiVisible?'block':'none';
+    document.getElementById('btn-gui').classList.toggle('active-dark',AppModel.state.guiVisible);
+  },
+
+  togglePanel(){
+    AppModel.state.panelOpen=!AppModel.state.panelOpen;
+    document.getElementById('side-panel').classList.toggle('open',AppModel.state.panelOpen);
+    document.getElementById('btn-info').classList.toggle('active-dark',AppModel.state.panelOpen);
+  },
+
+  _loop(){
+    requestAnimationFrame(()=>AppController._loop());
+    const dt=AppModel.clock.getDelta();
+    if(AppModel.mixer)AppModel.mixer.update(dt);
+    AppModel.controls.update();
+    if(AppModel.gp.spotMoving&&AppModel.state.spotOn)AppModel.lights.spot.position.x=Math.sin(AppModel.clock.getElapsedTime())*4;
+    AppModel.renderer.render(AppModel.scene,AppModel.camera);
+  }
+};
+
+AppController.init();
+</script>
+</body>
+</html>

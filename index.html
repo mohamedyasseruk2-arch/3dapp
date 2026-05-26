@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>FORM. — Apple 3D Experience</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --silver-50:  #FAFAFA;
+      --silver-100: #F4F4F5;
+      --silver-200: #E4E4E7;
+      --silver-300: #D1D1D6;
+      --silver-400: #A1A1AA;
+      --silver-500: #71717A;
+      --silver-600: #52525B;
+      --silver-700: #3F3F46;
+      --silver-800: #27272A;
+      --silver-900: #18181B;
+      --chrome:     #C8C8D0;
+      --gold-hint:  #B8A98A;
+      --bg:         #0C0C0E;
+      --surface:    #131316;
+      --surface-2:  #1A1A1F;
+      --border:     rgba(255,255,255,0.06);
+      --border-2:   rgba(255,255,255,0.10);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--bg);
+      color: var(--silver-100);
+      font-family: 'Outfit', sans-serif;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    /* ── CUSTOM CURSOR ── */
+    * { cursor: none !important; }
+    .cur { width:6px; height:6px; background:#fff; border-radius:50%; position:fixed; pointer-events:none; z-index:9999; transform:translate(-50%,-50%); transition:transform .15s, background .2s; mix-blend-mode:difference; }
+    .cur-ring { width:32px; height:32px; border:1px solid rgba(200,200,208,.4); border-radius:50%; position:fixed; pointer-events:none; z-index:9998; transform:translate(-50%,-50%); transition:all .18s ease; }
+
+    /* ── NAV ── */
+    .nav {
+      position: fixed; top:0; left:0; right:0; z-index:500;
+      padding: 0 40px; height: 60px;
+      display: flex; align-items: center; justify-content: space-between;
+      background: rgba(12,12,14,0); transition: background .4s, border .4s;
+    }
+    .nav.stuck {
+      background: rgba(12,12,14,.88);
+      backdrop-filter: blur(24px) saturate(160%);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-logo {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 22px; font-weight: 600; letter-spacing: .12em;
+      color: var(--silver-100); text-decoration: none;
+    }
+    .nav-logo em { font-style: italic; color: var(--chrome); }
+    .nav-links { display:flex; gap:32px; list-style:none; }
+    .nav-links a { font-size:12px; font-weight:400; letter-spacing:.14em; text-transform:uppercase; color:var(--silver-400); text-decoration:none; transition:color .2s; }
+    .nav-links a:hover { color:var(--silver-100); }
+
+    /* ── HERO ── */
+    .hero {
+      min-height: 100vh;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      text-align: center; padding: 0 24px;
+      position: relative; overflow: hidden;
+    }
+
+    /* metallic gradient background */
+    .hero-bg {
+      position: absolute; inset: 0; z-index: 0;
+      background:
+        radial-gradient(ellipse 80% 60% at 50% 0%, rgba(200,200,208,.04) 0%, transparent 70%),
+        radial-gradient(ellipse 40% 40% at 20% 80%, rgba(184,169,138,.03) 0%, transparent 60%),
+        radial-gradient(ellipse 40% 40% at 80% 20%, rgba(200,200,208,.03) 0%, transparent 60%);
+    }
+
+    /* subtle grain */
+    .hero-grain {
+      position: absolute; inset: 0; z-index: 1; pointer-events: none; opacity: .3;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.4'/%3E%3C/svg%3E");
+    }
+
+    .hero-content { position:relative; z-index:2; }
+
+    .hero-kicker {
+      font-size: 11px; font-weight: 500; letter-spacing: .28em; text-transform: uppercase;
+      color: var(--chrome); margin-bottom: 28px;
+      display: flex; align-items: center; justify-content: center; gap: 12px;
+      opacity: 0; animation: rise .8s ease forwards .2s;
+    }
+    .hero-kicker::before, .hero-kicker::after { content:''; flex:1; max-width:48px; height:1px; background:linear-gradient(90deg, transparent, var(--chrome)); }
+    .hero-kicker::after { transform:scaleX(-1); }
+
+    .hero-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(56px, 10vw, 120px);
+      font-weight: 300; letter-spacing: -.02em; line-height: .95;
+      margin-bottom: 32px;
+      background: linear-gradient(135deg, var(--silver-100) 0%, var(--chrome) 40%, var(--silver-300) 70%, var(--silver-100) 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+      opacity: 0; animation: rise .9s ease forwards .4s;
+    }
+    .hero-title em { font-style: italic; }
+
+    .hero-sub {
+      font-size: clamp(15px, 2vw, 19px); font-weight: 300; line-height: 1.7;
+      color: var(--silver-400); max-width: 480px; margin: 0 auto 48px;
+      opacity: 0; animation: rise .9s ease forwards .6s;
+    }
+
+    .hero-cta-wrap {
+      display: flex; gap: 16px; justify-content: center; flex-wrap: wrap;
+      opacity: 0; animation: rise .9s ease forwards .8s;
+    }
+
+    .btn-primary {
+      padding: 13px 32px;
+      background: linear-gradient(135deg, var(--silver-200), var(--chrome), var(--silver-300));
+      color: var(--silver-900); font-size: 12px; font-weight: 600;
+      letter-spacing: .14em; text-transform: uppercase;
+      border-radius: 2px; text-decoration: none; border: none;
+      position: relative; overflow: hidden;
+      transition: transform .2s, box-shadow .2s;
+    }
+    .btn-primary::before {
+      content: ''; position: absolute; inset: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,.3) 0%, transparent 60%);
+      pointer-events: none;
+    }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(200,200,208,.15); color: var(--silver-900); }
+
+    .btn-ghost {
+      padding: 13px 32px;
+      border: 1px solid var(--border-2); color: var(--silver-300);
+      font-size: 12px; font-weight: 500; letter-spacing: .14em; text-transform: uppercase;
+      border-radius: 2px; text-decoration: none;
+      transition: border-color .2s, color .2s;
+    }
+    .btn-ghost:hover { border-color: var(--silver-400); color: var(--silver-100); }
+
+    /* ── DIVIDER ── */
+    .chrome-line {
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--chrome), var(--silver-400), var(--chrome), transparent);
+      opacity: .25;
+    }
+
+    /* ── MARQUEE ── */
+    .marquee { overflow: hidden; padding: 18px 0; background: var(--surface); }
+    .marquee-track { display:flex; gap:64px; width:max-content; animation: marquee 28s linear infinite; }
+    .marquee-item { font-size:11px; font-weight:500; letter-spacing:.22em; text-transform:uppercase; color:var(--silver-500); white-space:nowrap; }
+    .marquee-dot { color:var(--chrome); }
+    @keyframes marquee { from{transform:translateX(0)} to{transform:translateX(-50%)} }
+
+    /* ── PRODUCTS ── */
+    .products { padding: 120px 40px; }
+    .products-header { text-align:center; margin-bottom:80px; }
+    .products-eyebrow { font-size:11px; font-weight:500; letter-spacing:.28em; text-transform:uppercase; color:var(--chrome); margin-bottom:16px; }
+    .products-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(36px, 5vw, 60px); font-weight:300; letter-spacing:-.01em;
+      color: var(--silver-100); line-height: 1.1;
+    }
+    .products-title em { font-style:italic; color:var(--chrome); }
+
+    .product-row { display:grid; grid-template-columns:repeat(3,1fr); gap:1px; background:var(--border); border:1px solid var(--border); max-width:1100px; margin:0 auto; }
+    .product-card {
+      background: var(--surface);
+      padding: 56px 40px 48px;
+      text-align: center;
+      text-decoration: none; color: var(--silver-100);
+      position: relative; overflow: hidden;
+      transition: background .3s;
+    }
+    .product-card::before {
+      content:''; position:absolute; top:0; left:0; right:0; height:1px;
+      background: linear-gradient(90deg, transparent, var(--chrome), transparent);
+      opacity:0; transition:opacity .3s;
+    }
+    .product-card:hover { background:var(--surface-2); color:var(--silver-100); }
+    .product-card:hover::before { opacity:.6; }
+
+    .product-num { font-size:10px; font-weight:500; letter-spacing:.24em; text-transform:uppercase; color:var(--silver-600); margin-bottom:32px; }
+    .product-icon { font-size:56px; display:block; margin-bottom:24px; filter:drop-shadow(0 4px 24px rgba(200,200,208,.15)); }
+    .product-name { font-family:'Cormorant Garamond',serif; font-size:28px; font-weight:400; letter-spacing:-.01em; margin-bottom:8px; color:var(--silver-100); }
+    .product-sub { font-size:12px; font-weight:400; letter-spacing:.06em; color:var(--silver-500); margin-bottom:24px; }
+    .product-cta { font-size:11px; font-weight:500; letter-spacing:.18em; text-transform:uppercase; color:var(--chrome); }
+
+    /* ── FEATURES ── */
+    .features { padding:80px 40px; border-top:1px solid var(--border); }
+    .features-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:40px; max-width:1000px; margin:0 auto; }
+    .feature { text-align:center; }
+    .feature-num { font-family:'Cormorant Garamond',serif; font-size:52px; font-weight:300; letter-spacing:-.02em; background:linear-gradient(135deg,var(--silver-200),var(--chrome)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; margin-bottom:8px; }
+    .feature-label { font-size:11px; font-weight:600; letter-spacing:.18em; text-transform:uppercase; color:var(--silver-100); margin-bottom:6px; }
+    .feature-desc { font-size:13px; font-weight:300; color:var(--silver-500); line-height:1.6; }
+
+    /* ── FOOTER ── */
+    .footer { padding:40px; border-top:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; font-size:11px; color:var(--silver-600); flex-wrap:wrap; gap:12px; }
+    .footer a { color:var(--silver-500); text-decoration:none; transition:color .2s; }
+    .footer a:hover { color:var(--silver-100); }
+    .footer-links { display:flex; gap:24px; }
+
+    @keyframes rise { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
+
+    @media(max-width:768px) {
+      .nav{padding:0 20px} .hero{padding:0 20px} .products{padding:80px 20px}
+      .product-row{grid-template-columns:1fr} .features-grid{grid-template-columns:1fr 1fr;gap:24px}
+      .footer{padding:24px 20px;flex-direction:column;text-align:center} .footer-links{justify-content:center}
+      *{cursor:auto!important} .cur,.cur-ring{display:none}
+    }
+  </style>
+</head>
+<body>
+
+<div class="cur" id="cur"></div>
+<div class="cur-ring" id="cur-ring"></div>
+
+<!-- NAV -->
+<nav class="nav" id="nav">
+  <a href="index.html" class="nav-logo">FORM<em>.</em></a>
+  <ul class="nav-links">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="viewer.html">3D Viewer</a></li>
+    <li><a href="about.html">About</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-grain"></div>
+  <div class="hero-content">
+    <div class="hero-kicker">Interactive 3D Experience</div>
+    <h1 class="hero-title">Three products.<br><em>One experience.</em></h1>
+    <p class="hero-sub">Explore Apple's most iconic devices rendered in real-time 3D. Rotate, inspect and animate — directly in your browser.</p>
+    <div class="hero-cta-wrap">
+      <a href="viewer.html" class="btn-primary">Enter the viewer</a>
+      <a href="about.html" class="btn-ghost">Learn more</a>
+    </div>
+  </div>
+</section>
+
+<div class="chrome-line"></div>
+
+<!-- MARQUEE -->
+<div class="marquee">
+  <div class="marquee-track">
+    <span class="marquee-item">iPhone 15 Pro</span><span class="marquee-dot">·</span>
+    <span class="marquee-item">AirPods Pro 2</span><span class="marquee-dot">·</span>
+    <span class="marquee-item">Apple Watch S7</span><span class="marquee-dot">·</span>
+    <span class="marquee-item">Three.js WebGL</span><span class="marquee-dot">·</span>
+    <span class="marquee-item">Real-time 3D</span><span class="marquee-dot">·</span>
+    <span class="marquee-item">University of Sussex</span><span class="marquee-dot">·</span>
+    <span class="marquee-item">Interactive Design</span><span class="marquee-dot">·</span>
+    <span class="marquee-item">iPhone 15 Pro</span><span class="marquee-dot">·</span>
+    <span class="marquee-item">AirPods Pro 2</span><span class="marquee-dot">·</span>
+    <span class="marquee-item">Apple Watch S7</span><span class="marquee-dot">·</span>
+    <span class="marquee-item">Three.js WebGL</span><span class="marquee-dot">·</span>
+    <span class="marquee-item">Real-time 3D</span><span class="marquee-dot">·</span>
+    <span class="marquee-item">University of Sussex</span><span class="marquee-dot">·</span>
+    <span class="marquee-item">Interactive Design</span><span class="marquee-dot">·</span>
+  </div>
+</div>
+
+<div class="chrome-line"></div>
+
+<!-- PRODUCTS -->
+<section class="products">
+  <div class="products-header">
+    <div class="products-eyebrow">The Collection</div>
+    <h2 class="products-title">Crafted in <em>three dimensions</em></h2>
+  </div>
+  <div class="product-row">
+    <a href="viewer.html?product=iphone" class="product-card">
+      <div class="product-num">01</div>
+      <span class="product-icon">📱</span>
+      <div class="product-name">iPhone 15 Pro</div>
+      <div class="product-sub">Titanium · A17 Pro · 6.1"</div>
+      <div class="product-cta">View in 3D →</div>
+    </a>
+    <a href="viewer.html?product=airpods" class="product-card">
+      <div class="product-num">02</div>
+      <span class="product-icon">🎧</span>
+      <div class="product-name">AirPods Pro</div>
+      <div class="product-sub">2nd Generation · H2 Chip</div>
+      <div class="product-cta">View in 3D →</div>
+    </a>
+    <a href="viewer.html?product=watch" class="product-card">
+      <div class="product-num">03</div>
+      <span class="product-icon">⌚</span>
+      <div class="product-name">Apple Watch</div>
+      <div class="product-sub">Series 7 · 45mm · Midnight</div>
+      <div class="product-cta">View in 3D →</div>
+    </a>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="features">
+  <div class="features-grid">
+    <div class="feature">
+      <div class="feature-num">3D</div>
+      <div class="feature-label">Real-time</div>
+      <div class="feature-desc">WebGL rendering with physically-based materials</div>
+    </div>
+    <div class="feature">
+      <div class="feature-num">3</div>
+      <div class="feature-label">Products</div>
+      <div class="feature-desc">Each with unique geometry and animations</div>
+    </div>
+    <div class="feature">
+      <div class="feature-num">8+</div>
+      <div class="feature-label">Controls</div>
+      <div class="feature-desc">Wireframe, lighting, camera and animation</div>
+    </div>
+    <div class="feature">
+      <div class="feature-num">360°</div>
+      <div class="feature-label">Viewpoints</div>
+      <div class="feature-desc">Drag, zoom and pan every product freely</div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <span>© 2026 University of Sussex · 3D Applications · myam20</span>
+  <div class="footer-links">
+    <a href="viewer.html">3D Viewer</a>
+    <a href="about.html">About</a>
+    <a href="submission.html">Submission</a>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  // Nav scroll
+  const nav = document.getElementById('nav');
+  window.addEventListener('scroll', ()=> nav.classList.toggle('stuck', window.scrollY > 20), {passive:true});
+
+  // Custom cursor
+  const cur = document.getElementById('cur');
+  const ring = document.getElementById('cur-ring');
+  let mx=0,my=0,rx=0,ry=0;
+  window.addEventListener('mousemove', e=>{ mx=e.clientX; my=e.clientY; cur.style.left=mx+'px'; cur.style.top=my+'px'; });
+  (function loop(){ rx+=(mx-rx)*.1; ry+=(my-ry)*.1; ring.style.left=rx+'px'; ring.style.top=ry+'px'; requestAnimationFrame(loop); })();
+  document.querySelectorAll('a,button').forEach(el=>{
+    el.addEventListener('mouseenter',()=>{ cur.style.transform='translate(-50%,-50%) scale(3)'; ring.style.transform='translate(-50%,-50%) scale(1.4)'; });
+    el.addEventListener('mouseleave',()=>{ cur.style.transform='translate(-50%,-50%) scale(1)'; ring.style.transform='translate(-50%,-50%) scale(1)'; });
+  });
+
+  // Scroll reveal
+  const obs = new IntersectionObserver(entries=>{
+    entries.forEach(e=>{ if(e.isIntersecting){ e.target.style.opacity='1'; e.target.style.transform='translateY(0)'; }});
+  },{threshold:.1});
+  document.querySelectorAll('.product-card,.feature').forEach(el=>{
+    el.style.opacity='0'; el.style.transform='translateY(24px)';
+    el.style.transition='opacity .6s ease, transform .6s ease';
+    obs.observe(el);
+  });
+</script>
+</body>
+</html>

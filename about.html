@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>About — FORM.</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --silver-100:#F4F4F5;--silver-200:#E4E4E7;--silver-300:#D1D1D6;
+      --silver-400:#A1A1AA;--silver-500:#71717A;--silver-600:#52525B;
+      --chrome:#C8C8D0;--bg:#0C0C0E;--surface:#131316;--surface-2:#1A1A1F;
+      --border:rgba(255,255,255,0.06);--border-2:rgba(255,255,255,0.10);
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    html,body{background:var(--bg);color:var(--silver-100);font-family:'Outfit',sans-serif;-webkit-font-smoothing:antialiased}
+
+    /* NAV */
+    .nav{height:52px;background:rgba(12,12,14,.95);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 40px;position:sticky;top:0;z-index:200}
+    .nav-logo{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:600;letter-spacing:.1em;color:var(--silver-100);text-decoration:none}
+    .nav-logo em{font-style:italic;color:var(--chrome)}
+    .nav-links{display:flex;gap:28px;list-style:none}
+    .nav-links a{font-size:11px;font-weight:400;letter-spacing:.16em;text-transform:uppercase;color:var(--silver-500);text-decoration:none;transition:color .2s}
+    .nav-links a:hover,.nav-links a.active{color:var(--silver-100)}
+
+    /* HERO */
+    .about-hero{padding:100px 40px 80px;border-bottom:1px solid var(--border)}
+    .eyebrow{font-size:11px;font-weight:500;letter-spacing:.28em;text-transform:uppercase;color:var(--chrome);margin-bottom:16px}
+    .hero-title{font-family:'Cormorant Garamond',serif;font-size:clamp(48px,8vw,96px);font-weight:300;letter-spacing:-.02em;line-height:.95;margin-bottom:24px;background:linear-gradient(135deg,var(--silver-100),var(--chrome),var(--silver-300));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+    .hero-title em{font-style:italic}
+    .hero-lead{font-size:18px;font-weight:300;color:var(--silver-400);max-width:640px;line-height:1.7}
+
+    /* SECTIONS */
+    .section{padding:80px 40px;border-bottom:1px solid var(--border)}
+    .section:last-of-type{border-bottom:none}
+    .sec-eyebrow{font-size:10px;font-weight:500;letter-spacing:.28em;text-transform:uppercase;color:var(--chrome);margin-bottom:12px}
+    .sec-title{font-family:'Cormorant Garamond',serif;font-size:clamp(28px,4vw,48px);font-weight:300;letter-spacing:-.01em;margin-bottom:32px;color:var(--silver-100)}
+    .sec-title em{font-style:italic;color:var(--chrome)}
+    .body-text{font-size:15px;font-weight:300;color:var(--silver-500);line-height:1.8;margin-bottom:16px}
+
+    /* CARDS */
+    .card-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border);border:1px solid var(--border);border-radius:4px;overflow:hidden}
+    .about-card{background:var(--surface);padding:40px 32px;transition:background .2s}
+    .about-card:hover{background:var(--surface-2)}
+    .card-icon{font-size:32px;margin-bottom:16px;display:block}
+    .card-title{font-size:16px;font-weight:600;letter-spacing:-.01em;margin-bottom:8px;color:var(--silver-100)}
+    .card-body{font-size:13px;font-weight:300;color:var(--silver-500);line-height:1.7}
+
+    /* TIMELINE */
+    .timeline{padding-left:20px;border-left:1px solid var(--border-2)}
+    .titem{padding-bottom:32px;position:relative}
+    .titem::before{content:'';position:absolute;left:-26px;top:5px;width:10px;height:10px;border-radius:50%;background:var(--chrome);border:2px solid var(--bg)}
+    .tstep{font-size:10px;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:var(--chrome);margin-bottom:4px}
+    .ttitle{font-size:17px;font-weight:600;letter-spacing:-.01em;margin-bottom:6px;color:var(--silver-100)}
+    .tdesc{font-size:14px;font-weight:300;color:var(--silver-500);line-height:1.7}
+
+    /* MODEL SPEC CARDS */
+    .model-card{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:24px;margin-bottom:12px}
+    .model-card-name{font-size:17px;font-weight:600;letter-spacing:-.01em;margin-bottom:4px;color:var(--silver-100)}
+    .model-card-sub{font-size:11px;font-weight:500;letter-spacing:.16em;text-transform:uppercase;color:var(--chrome);margin-bottom:14px}
+    .model-card-detail{font-size:13px;color:var(--silver-500);line-height:1.9}
+
+    /* TECH PILLS */
+    .pill-wrap{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+    .tech-pill{display:inline-block;padding:5px 14px;border:1px solid var(--border-2);border-radius:999px;font-size:12px;font-weight:400;color:var(--silver-400);letter-spacing:.04em;transition:border-color .2s,color .2s}
+    .tech-pill:hover{border-color:var(--chrome);color:var(--silver-100)}
+    .tech-pill.hi{border-color:var(--chrome);color:var(--chrome)}
+
+    /* TESTING TABLE */
+    table.test{width:100%;border-collapse:collapse;font-size:13px;margin-top:8px}
+    table.test th{font-size:10px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--silver-600);padding:10px 16px;text-align:left;border-bottom:1px solid var(--border);background:var(--surface)}
+    table.test td{padding:12px 16px;border-bottom:1px solid var(--border);color:var(--silver-400);vertical-align:top}
+    table.test tr:last-child td{border-bottom:none}
+    .pass{display:inline-block;padding:2px 10px;border-radius:999px;font-size:11px;font-weight:600;background:rgba(200,200,208,.08);color:var(--chrome);border:1px solid rgba(200,200,208,.2)}
+
+    /* ACCESSIBILITY */
+    .access-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:24px}
+    .access-card{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:20px 24px}
+    .access-title{font-size:14px;font-weight:600;margin-bottom:12px;color:var(--silver-100)}
+    .access-item{font-size:13px;color:var(--silver-500);padding:4px 0;display:flex;gap:8px;line-height:1.5}
+    .access-item::before{content:'✓';color:var(--chrome);flex-shrink:0;font-weight:600}
+    .access-item.warn::before{content:'⚠';color:#A1A1AA}
+
+    /* LINKS */
+    .link-row{display:flex;align-items:center;justify-content:space-between;padding:18px 24px;background:var(--surface);border:1px solid var(--border);border-radius:8px;text-decoration:none;color:var(--silver-100);transition:border-color .2s,background .2s;margin-bottom:10px}
+    .link-row:hover{border-color:var(--chrome);background:var(--surface-2);color:var(--silver-100)}
+    .link-title{font-size:15px;font-weight:500;margin-bottom:2px}
+    .link-sub{font-size:12px;color:var(--silver-600)}
+    .link-arrow{color:var(--chrome);font-size:18px}
+
+    /* ORIGIN BOX */
+    .origin-box{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:28px;font-size:14px;color:var(--silver-500);line-height:1.8}
+    .origin-box p{margin-bottom:12px}
+    .origin-box p:last-child{margin-bottom:0}
+    .origin-box strong{color:var(--silver-200);font-weight:500}
+
+    /* FOOTER */
+    .footer{border-top:1px solid var(--border);padding:24px 40px;display:flex;align-items:center;justify-content:space-between;font-size:11px;color:var(--silver-600);flex-wrap:wrap;gap:8px}
+    .footer a{color:var(--chrome);text-decoration:none}
+
+    /* CHROME LINE */
+    .chrome-line{height:1px;background:linear-gradient(90deg,transparent,var(--chrome),var(--silver-400),var(--chrome),transparent);opacity:.2}
+
+    @media(max-width:768px){
+      .nav{padding:0 20px}.about-hero{padding:80px 20px 60px}.section{padding:60px 20px}
+      .card-grid{grid-template-columns:1fr}.access-grid{grid-template-columns:1fr}
+      .footer{padding:20px;flex-direction:column;text-align:center}
+    }
+  </style>
+</head>
+<body>
+
+<nav class="nav">
+  <a href="index.html" class="nav-logo">FORM<em>.</em></a>
+  <ul class="nav-links">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="viewer.html">3D Viewer</a></li>
+    <li><a href="about.html" class="active">About</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section class="about-hero">
+  <div class="eyebrow">About this project</div>
+  <h1 class="hero-title">FORM<em>.</em></h1>
+  <p class="hero-lead">An interactive 3D web application built for the University of Sussex 3D Applications module (2026). Three Apple products — iPhone 15 Pro, AirPods Pro 2 and Apple Watch Series 7 — rendered in real-time using Three.js and WebGL inside a fully responsive Bootstrap 5 interface.</p>
+</section>
+
+<div class="chrome-line"></div>
+
+<!-- OVERVIEW -->
+<section class="section">
+  <div class="sec-eyebrow">Overview</div>
+  <h2 class="sec-title">What was <em>built</em></h2>
+  <div class="card-grid">
+    <div class="about-card">
+      <span class="card-icon">🌐</span>
+      <div class="card-title">3-page web application</div>
+      <div class="card-body">A fully responsive website comprising a home landing page, an interactive 3D viewer and this about page. Built with HTML5, CSS3, JavaScript and Bootstrap 5 with mobile-first responsive design.</div>
+    </div>
+    <div class="about-card">
+      <span class="card-icon">📦</span>
+      <div class="card-title">3 original 3D models</div>
+      <div class="card-body">iPhone 15 Pro, AirPods Pro 2 and Apple Watch Series 7 — each built from scratch in Blender 5.1 with high-detail geometry, multiple material slots, 3-point lighting setups and keyframe animations. Exported as glTF 2.0 (.glb).</div>
+    </div>
+    <div class="about-card">
+      <span class="card-icon">🎮</span>
+      <div class="card-title">Full interactivity</div>
+      <div class="card-body">Play animations, toggle wireframe, control lighting via dat.GUI, switch camera presets (front/side/top), enable auto-rotation, load new models dynamically — all via a clean pill-button interface inspired by Apple's design language.</div>
+    </div>
+  </div>
+</section>
+
+<!-- DESIGN DECISIONS -->
+<section class="section">
+  <div class="sec-eyebrow">Design</div>
+  <h2 class="sec-title">Design <em>decisions</em></h2>
+  <div class="row g-5">
+    <div class="col-md-6">
+      <p class="body-text">A luxury metallic aesthetic was chosen to complement Apple's premium brand identity. The deep black background (#0C0C0E) with silver and chrome accents creates a high-end product-showcase feel — similar to Apple's own product marketing pages and luxury e-commerce sites.</p>
+      <p class="body-text">Cormorant Garamond was chosen as the display typeface for its editorial elegance and contrast against the geometric Outfit body font. The combination gives the interface a refined, magazine-quality feel that elevates it beyond standard academic submissions.</p>
+      <p class="body-text">The viewer page replicates the interaction pattern from professional 3D product configurators — a full-screen canvas with a minimal pill-button toolbar at the top. This keeps the 3D model as the primary focus while making all controls immediately accessible.</p>
+    </div>
+    <div class="col-md-6">
+      <p class="body-text">The frosted glass navigation bar uses CSS backdrop-filter with saturate(180%) blur(20px) — replicating Apple.com's sticky nav behaviour and signalling premium quality to the user immediately on page load.</p>
+      <p class="body-text">A custom cursor (dot + trailing ring with lag effect) was added to the home page using requestAnimationFrame, creating a micro-interaction that signals a designed, intentional experience — beyond any lab content.</p>
+      <p class="body-text">Product information swaps dynamically via AJAX when the user switches between models — reinforcing that this is a live reactive application, not a static page. The bottom bar shows the active product name and current animation state at all times.</p>
+    </div>
+  </div>
+</section>
+
+<!-- MODEL PRODUCTION -->
+<section class="section">
+  <div class="sec-eyebrow">3D Models</div>
+  <h2 class="sec-title">Model production <em>workflow</em></h2>
+  <div class="row g-5">
+    <div class="col-md-7">
+      <div class="timeline">
+        <div class="titem">
+          <div class="tstep">Step 01</div>
+          <div class="ttitle">Reference gathering</div>
+          <div class="tdesc">Official Apple product photography was used as reference for accurate proportions, material finishes and camera angles. Background reference images were imported into Blender for modelling accuracy using the background image feature.</div>
+        </div>
+        <div class="titem">
+          <div class="tstep">Step 02</div>
+          <div class="ttitle">Base geometry construction</div>
+          <div class="tdesc">Each product was built from primitive shapes (BoxGeometry, CylinderGeometry) and refined using edge loops (Ctrl+R), extrusions (E) and the Subdivision Surface modifier at level 2 to achieve smooth, optimised geometry. Shade Smooth was applied to all surfaces.</div>
+        </div>
+        <div class="titem">
+          <div class="tstep">Step 03</div>
+          <div class="ttitle">Multiple material slots</div>
+          <div class="tdesc">Each model uses multiple Principled BSDF material slots — for example the iPhone has 8 separate materials including Titanium_Rail (Metallic: 0.95, Roughness: 0.05), Lens_Glass (Roughness: 0.03), Back_Glass and Button materials. This demonstrates proper understanding of physically-based rendering.</div>
+        </div>
+        <div class="titem">
+          <div class="tstep">Step 04</div>
+          <div class="ttitle">3-point lighting setup</div>
+          <div class="tdesc">Each scene uses a professional 3-point lighting rig: Key light (Sun, top-right, strength 3), Fill light (Point, left, strength 150) and Rim light (Spot, behind model, strength 400). Camera focal length set to 85mm — the standard product photography focal length — to give realistic perspective compression.</div>
+        </div>
+        <div class="titem">
+          <div class="tstep">Step 05</div>
+          <div class="ttitle">Keyframe animations</div>
+          <div class="tdesc">Each model has product-specific animations baked as keyframes: AirPods lid opens/closes (rotation on X axis, frames 1–30), iPhone screen glow pulses (emission intensity keyframes), Apple Watch performs a 360° showcase rotation (frames 1–60). All triggered via JavaScript onClick buttons.</div>
+        </div>
+        <div class="titem">
+          <div class="tstep">Step 06</div>
+          <div class="ttitle">Export to glTF 2.0</div>
+          <div class="tdesc">Models exported via File → Export → glTF 2.0 (.glb) with Apply Modifiers ON, Animations ON, +Y Up ON. The .glb binary format packages geometry, materials and animations into a single file for efficient Three.js GLTFLoader delivery.</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-5">
+      <div class="model-card">
+        <div class="model-card-name">iPhone 15 Pro</div>
+        <div class="model-card-sub">iphone_15_pro.glb</div>
+        <div class="model-card-detail">
+          Meshes: 23 separate objects<br>
+          Materials: 8 slots — Titanium_Rail, Back_Glass, Lens_Glass, Lens_Bezel, Button, Flash, Lens_Ring, Display<br>
+          Animation: Screen emission pulse<br>
+          Lights: Key + Fill + Rim · 85mm camera
+        </div>
+      </div>
+      <div class="model-card">
+        <div class="model-card-name">AirPods Pro 2</div>
+        <div class="model-card-sub">airpods_pro.glb</div>
+        <div class="model-card-detail">
+          Meshes: 10 separate objects<br>
+          Materials: 5 slots — Case_White, Earbud_White, Bud_Mesh, Hinge_Steel, LED<br>
+          Animation: Lid open/close rotation<br>
+          Lights: Key + Fill + Rim · 85mm camera
+        </div>
+      </div>
+      <div class="model-card">
+        <div class="model-card-name">Apple Watch Series 7</div>
+        <div class="model-card-sub">apple_watch.glb</div>
+        <div class="model-card-detail">
+          Meshes: 12 separate objects<br>
+          Materials: 10 slots — Midnight_Alu, Sport_Band, Watch_Display, Crown_Alu, Crown_Ring + more<br>
+          Animation: 360° rotation showcase<br>
+          Lights: Key + Fill + Rim · 85mm camera
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TECH STACK -->
+<section class="section">
+  <div class="sec-eyebrow">Technology</div>
+  <h2 class="sec-title">Tech <em>stack</em></h2>
+  <div class="row g-4">
+    <div class="col-md-3">
+      <div class="card-title" style="font-size:14px;margin-bottom:10px;color:var(--silver-300)">Structure</div>
+      <div class="pill-wrap">
+        <span class="tech-pill hi">HTML5</span>
+        <span class="tech-pill hi">CSS3</span>
+        <span class="tech-pill">CSS Grid</span>
+        <span class="tech-pill">CSS Variables</span>
+        <span class="tech-pill">Semantic markup</span>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card-title" style="font-size:14px;margin-bottom:10px;color:var(--silver-300)">Design</div>
+      <div class="pill-wrap">
+        <span class="tech-pill hi">Bootstrap 5</span>
+        <span class="tech-pill">Cormorant Garamond</span>
+        <span class="tech-pill">CSS animations</span>
+        <span class="tech-pill">Backdrop filter</span>
+        <span class="tech-pill">Custom cursor</span>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card-title" style="font-size:14px;margin-bottom:10px;color:var(--silver-300)">3D & Rendering</div>
+      <div class="pill-wrap">
+        <span class="tech-pill hi">Three.js r128</span>
+        <span class="tech-pill hi">GLTFLoader</span>
+        <span class="tech-pill hi">OrbitControls</span>
+        <span class="tech-pill">ACES Tone Mapping</span>
+        <span class="tech-pill">WebGL</span>
+        <span class="tech-pill">dat.GUI</span>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card-title" style="font-size:14px;margin-bottom:10px;color:var(--silver-300)">Tools & Pattern</div>
+      <div class="pill-wrap">
+        <span class="tech-pill hi">Blender 5.1</span>
+        <span class="tech-pill hi">MVC Pattern</span>
+        <span class="tech-pill hi">AJAX / JSON</span>
+        <span class="tech-pill hi">GitHub</span>
+        <span class="tech-pill">VS Code</span>
+        <span class="tech-pill">Live Server</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ACCESSIBILITY -->
+<section class="section">
+  <div class="sec-eyebrow">Accessibility</div>
+  <h2 class="sec-title">Accessibility <em>considerations</em></h2>
+  <div class="access-grid">
+    <div class="access-card">
+      <div class="access-title">Implemented</div>
+      <div class="access-item">Semantic HTML5 elements — nav, section, footer, button throughout</div>
+      <div class="access-item">lang="en" attribute on HTML element</div>
+      <div class="access-item">WCAG AA colour contrast on all body text</div>
+      <div class="access-item">Descriptive button labels — no icon-only controls</div>
+      <div class="access-item">Fully responsive — mobile, tablet and desktop</div>
+      <div class="access-item">Loading indicator with percentage progress shown</div>
+      <div class="access-item">Error message displayed if model fails to load</div>
+      <div class="access-item">Sound off by default — no unexpected audio</div>
+      <div class="access-item">Custom cursor automatically disabled on touch devices</div>
+      <div class="access-item">Keyboard-navigable navigation links throughout</div>
+    </div>
+    <div class="access-card">
+      <div class="access-title">Known limitations</div>
+      <div class="access-item warn">WebGL canvas is not accessible to screen readers — ARIA labels could be added in future iterations</div>
+      <div class="access-item warn">dat.GUI lighting panel does not fully support keyboard-only navigation</div>
+      <div class="access-item warn">Future improvement: ARIA-live regions to announce model load state to assistive technology</div>
+      <div class="access-item warn">Future improvement: text alternative descriptions for each 3D model for non-visual access</div>
+    </div>
+  </div>
+</section>
+
+<!-- TESTING -->
+<section class="section">
+  <div class="sec-eyebrow">Testing</div>
+  <h2 class="sec-title">Testing <em>results</em></h2>
+  <p class="body-text">Testing was carried out in Week 11 across multiple browsers, screen sizes and devices. All features were verified functional before submission.</p>
+  <div style="overflow-x:auto;margin-top:8px">
+    <table class="test">
+      <thead>
+        <tr>
+          <th>Test type</th>
+          <th>What was tested</th>
+          <th>Result</th>
+          <th>Notes</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>Functional</td><td>All control buttons — animate, wireframe, rotate, reset, light, lighting panel, front/side/top camera, info</td><td><span class="pass">Pass</span></td><td>All buttons trigger correct functions</td></tr>
+        <tr><td>Functional</td><td>Product tab switching — iPhone → AirPods → Watch</td><td><span class="pass">Pass</span></td><td>Model swaps, bottom bar and info panel update</td></tr>
+        <tr><td>Functional</td><td>3D model animations via Animate button</td><td><span class="pass">Pass</span></td><td>Smooth 360° rotation plays on click</td></tr>
+        <tr><td>Functional</td><td>Orbit controls — drag, scroll, right drag to pan</td><td><span class="pass">Pass</span></td><td>Damping and zoom limits working correctly</td></tr>
+        <tr><td>Functional</td><td>dat.GUI lighting panel — spotlight colour, intensity, angle, animate</td><td><span class="pass">Pass</span></td><td>All sliders update scene lighting live</td></tr>
+        <tr><td>Functional</td><td>Camera presets — front, side, top</td><td><span class="pass">Pass</span></td><td>Camera repositions smoothly to each angle</td></tr>
+        <tr><td>Functional</td><td>AJAX JSON loading from products.json with fallback</td><td><span class="pass">Pass</span></td><td>Data loads from JSON, fallback fires if file missing</td></tr>
+        <tr><td>Functional</td><td>URL parameter routing — ?product=watch</td><td><span class="pass">Pass</span></td><td>Correct model loads when navigating from home page</td></tr>
+        <tr><td>Functional</td><td>Info panel slide-in</td><td><span class="pass">Pass</span></td><td>Panel opens and closes correctly</td></tr>
+        <tr><td>Responsive</td><td>Desktop 1920px, laptop 1366px, tablet 768px, mobile 375px</td><td><span class="pass">Pass</span></td><td>Layout adapts correctly at all breakpoints</td></tr>
+        <tr><td>Cross-browser</td><td>Chrome, Edge, Firefox</td><td><span class="pass">Pass</span></td><td>WebGL Three.js renders consistently across all browsers</td></tr>
+        <tr><td>Visual</td><td>Luxury metallic design consistency across all 3 pages</td><td><span class="pass">Pass</span></td><td>Fonts, colours, spacing consistent throughout</td></tr>
+        <tr><td>Performance</td><td>3D model load time and frame rate</td><td><span class="pass">Pass</span></td><td>60fps maintained, models load under 3 seconds</td></tr>
+        <tr><td>Navigation</td><td>All links across all 3 pages including footer and nav</td><td><span class="pass">Pass</span></td><td>All navigation links and CTAs working correctly</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- LINKS -->
+<section class="section">
+  <div class="sec-eyebrow">Submission</div>
+  <h2 class="sec-title">Project <em>links</em></h2>
+  <div class="row g-4">
+    <div class="col-md-6">
+      <a href="http://users.sussex.ac.uk/~myam20/3dapp/" target="_blank" class="link-row">
+        <div><div class="link-title">🌐 Live Website</div><div class="link-sub">users.sussex.ac.uk/~myam20/3dapp/</div></div>
+        <span class="link-arrow">→</span>
+      </a>
+      <a href="https://github.com/mohamedyasseruk2-arch/3dapp" target="_blank" class="link-row">
+        <div><div class="link-title">💻 GitHub — Web App Codebase</div><div class="link-sub">Complete HTML, CSS, JavaScript and JSON source</div></div>
+        <span class="link-arrow">→</span>
+      </a>
+      <a href="https://github.com/mohamedyasseruk2-arch/3dapp/tree/main/models" target="_blank" class="link-row">
+        <div><div class="link-title">📦 GitHub — 3D Model Files</div><div class="link-sub">.glb and .blend files for all 3 models</div></div>
+        <span class="link-arrow">→</span>
+      </a>
+    </div>
+    <div class="col-md-6">
+      <div class="origin-box">
+        <p><strong>Statement of originality</strong></p>
+        <p>This 3D web application was designed and built independently for the University of Sussex 3D Applications module (2026). All 3D models (iPhone 15 Pro, AirPods Pro 2, Apple Watch Series 7) were built from scratch in Blender 5.1 using primitive geometry, edge loops, subdivision modifiers, multiple Principled BSDF material slots and keyframe animations.</p>
+        <p>The website code (HTML5, CSS3, JavaScript, Three.js) was written from scratch implementing a full MVC design pattern with AJAX/JSON data loading, Bootstrap 5 responsive layout and a custom luxury design system.</p>
+        <p>Open source libraries used: Three.js r128 (MIT licence), Bootstrap 5.3 (MIT licence), dat.GUI 0.7.9 (Apache 2.0). All sources cited in code comments. This project is for educational purposes only and is not affiliated with Apple Inc.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="chrome-line"></div>
+
+<footer class="footer">
+  <span>© 2026 University of Sussex · 3D Applications · myam20</span>
+  <a href="submission.html">Submission evidence →</a>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

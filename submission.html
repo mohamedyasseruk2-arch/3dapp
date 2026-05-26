@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Submission — FORM.</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    :root{--chrome:#C8C8D0;--bg:#0C0C0E;--surface:#131316;--border:rgba(255,255,255,0.06);--border-2:rgba(255,255,255,0.10);--silver-100:#F4F4F5;--silver-400:#A1A1AA;--silver-500:#71717A;--silver-600:#52525B;}
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{background:var(--bg);color:var(--silver-100);font-family:'Outfit',sans-serif;-webkit-font-smoothing:antialiased;padding:60px 40px;max-width:860px;margin:0 auto}
+    h1{font-family:'Cormorant Garamond',serif;font-size:56px;font-weight:300;letter-spacing:-.02em;margin-bottom:6px}
+    h1 em{font-style:italic;color:var(--chrome)}
+    .sub{font-size:13px;font-weight:400;letter-spacing:.08em;color:var(--silver-600);margin-bottom:64px}
+    .item{margin-bottom:40px;padding-bottom:40px;border-bottom:1px solid var(--border)}
+    .item:last-child{border-bottom:none;margin-bottom:0}
+    .num{font-size:10px;font-weight:600;letter-spacing:.24em;text-transform:uppercase;color:var(--chrome);margin-bottom:8px}
+    .label{font-size:22px;font-weight:600;letter-spacing:-.02em;margin-bottom:12px;color:var(--silver-100)}
+    .value{font-size:14px;color:var(--silver-500);line-height:1.8}
+    .value a{color:var(--chrome);text-decoration:none}
+    .value a:hover{text-decoration:underline}
+    .value p{margin-bottom:10px}
+    .value p:last-child{margin-bottom:0}
+    .value strong{color:var(--silver-200);font-weight:500}
+    .tag{display:inline-block;padding:3px 12px;background:rgba(200,200,208,.08);border:1px solid rgba(200,200,208,.2);border-radius:999px;font-size:11px;font-weight:500;color:var(--chrome);margin:4px 4px 4px 0;letter-spacing:.04em}
+    .chrome-line{height:1px;background:linear-gradient(90deg,transparent,var(--chrome),transparent);opacity:.2;margin:64px 0}
+  </style>
+</head>
+<body>
+
+  <h1>FORM<em>.</em></h1>
+  <p class="sub">3D Applications Assignment · University of Sussex · 2026 · myam20</p>
+
+  <div class="item">
+    <div class="num">Evidence 01</div>
+    <div class="label">Packaged and launched through Visual Studio Code</div>
+    <div class="value">
+      <p>Project developed and tested locally using Visual Studio Code with the Live Server extension (port 5500). All project files organised in the <code>3d final app/</code> folder with a <code>models/</code> subfolder containing all .glb and .blend files.</p>
+      <p>Development workflow: edit in VSCode → preview with Live Server → commit to GitHub → deploy to Sussex ITS server via FileZilla SFTP.</p>
+      <span class="tag">VS Code</span>
+      <span class="tag">Live Server</span>
+      <span class="tag">FileZilla SFTP</span>
+      <span class="tag">GitHub Desktop</span>
+    </div>
+  </div>
+
+  <div class="item">
+    <div class="num">Evidence 02</div>
+    <div class="label">3D App ITS Web Server URL</div>
+    <div class="value">
+      <p><a href="http://users.sussex.ac.uk/~myam20/3dapp/" target="_blank">http://users.sussex.ac.uk/~myam20/3dapp/</a></p>
+      <p>Hosted on the University of Sussex ITS personal web server under the public_html directory. Accessible to anyone with the URL for marking purposes.</p>
+    </div>
+  </div>
+
+  <div class="item">
+    <div class="num">Evidence 03</div>
+    <div class="label">GitHub 3D App Codebase URL</div>
+    <div class="value">
+      <p><a href="https://github.com/mohamedyasseruk2-arch/3dapp" target="_blank">https://github.com/mohamedyasseruk2-arch/3dapp</a></p>
+      <p>Public GitHub repository containing complete source code: index.html, viewer.html, about.html, submission.html, products.json and all assets. Managed using GitHub Desktop with full commit history.</p>
+    </div>
+  </div>
+
+  <div class="item">
+    <div class="num">Evidence 04</div>
+    <div class="label">GitHub 3D Model Files URL</div>
+    <div class="value">
+      <p><a href="https://github.com/mohamedyasseruk2-arch/3dapp/tree/main/models" target="_blank">https://github.com/mohamedyasseruk2-arch/3dapp/tree/main/models</a></p>
+      <p>Contains all 6 model files:</p>
+      <p>
+        <span class="tag">iphone_15_pro.glb</span>
+        <span class="tag">iphone_15_pro.blend</span>
+        <span class="tag">airpods_pro.glb</span>
+        <span class="tag">airpods_pro.blend</span>
+        <span class="tag">apple_watch.glb</span>
+        <span class="tag">apple_watch.blend</span>
+      </p>
+    </div>
+  </div>
+
+  <div class="item">
+    <div class="num">Evidence 05</div>
+    <div class="label">Deeper Understanding Statement with testing feedback</div>
+    <div class="value">
+      <p><strong>Features beyond lab tutorials demonstrated in this project:</strong></p>
+
+      <p><strong>1. MVC Architecture</strong> — viewer.html implements a full Model-View-Controller design pattern with three completely separate JavaScript objects: AppModel (manages all 3D state, product data and Three.js objects), AppView (handles all DOM updates, tab building and loading states) and AppController (manages all event logic, model loading and animation). This goes significantly beyond the lab approach of inline scripting.</p>
+
+      <p><strong>2. AJAX / JSON data loading</strong> — Product data is loaded dynamically from products.json using XMLHttpRequest with a full fallback for offline/server environments. This demonstrates asynchronous data loading and separation of data from presentation — beyond any lab content.</p>
+
+      <p><strong>3. Bootstrap 5 beyond lab level</strong> — Full responsive 3-column grid layout with custom breakpoints, frosted glass navigation using CSS backdrop-filter saturate(180%) blur(20px), scroll-triggered fade animations via IntersectionObserver, and a marquee animation component.</p>
+
+      <p><strong>4. Advanced Three.js rendering</strong> — ACES Filmic tone mapping (renderer.toneMapping = THREE.ACESFilmicToneMapping), PCFSoft shadow maps, 4-point lighting setup (ambient hemisphere, key directional, fill directional, rim directional, controllable spotlight), and Three.js AnimationMixer for glTF animation playback.</p>
+
+      <p><strong>5. GitHub version control</strong> — Complete codebase managed via GitHub Desktop with full commit history. Public repository accessible to markers at the URL above. Using GitHub for codebase management as specified in the assignment brief.</p>
+
+      <p><strong>6. URL parameter routing</strong> — viewer.html reads ?product= URL parameters to load specific models when navigating from home page product tiles, creating a proper client-side routing pattern not covered in labs.</p>
+
+      <p><strong>7. Luxury design system</strong> — Custom design language with CSS variables, Cormorant Garamond display font, metallic gradient text effects, custom cursor with requestAnimationFrame lag effect, chrome divider lines with gradient opacity — all original design decisions beyond any lab content.</p>
+
+      <p><strong>Testing feedback:</strong> Tested in Chrome, Edge and Firefox. Responsive layout verified at 375px, 768px, 1366px and 1920px. All 9 control buttons verified functional. Product switching, wireframe toggle, lighting GUI, camera presets, auto-rotate and animation all confirmed working correctly. Models load under 3 seconds. 60fps maintained throughout. No console errors on final build.</p>
+    </div>
+  </div>
+
+  <div class="chrome-line"></div>
+
+  <div style="font-size:12px;color:var(--silver-600);text-align:center;padding-bottom:40px">
+    © 2026 University of Sussex · 3D Applications · myam20 ·
+    <a href="about.html" style="color:var(--chrome);text-decoration:none">About this project</a>
+  </div>
+
+</body>
+</html>

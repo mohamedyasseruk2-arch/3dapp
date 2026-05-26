@@ -1,0 +1,58 @@
+{
+  "products": [
+    {
+      "id": "iphone",
+      "name": "iPhone 15 Pro",
+      "tagline": "Titanium. So strong. So light. So Pro.",
+      "sub": "6.1-inch · A17 Pro · Titanium",
+      "desc": "The most advanced iPhone ever made. Featuring aerospace-grade titanium — the same alloy used by NASA for space missions — and the A17 Pro chip built on 3-nanometre technology.",
+      "specs": [
+        {"l":"Chip","v":"A17 Pro"},
+        {"l":"Display","v":"6.1\" Super Retina XDR"},
+        {"l":"Material","v":"Titanium"},
+        {"l":"Main Camera","v":"48MP Fusion"},
+        {"l":"Storage","v":"128GB–1TB"}
+      ],
+      "model": "models/iphone_15_pro.glb",
+      "anim": "screen glow",
+      "geom": "High detail — 23 meshes, 8 materials",
+      "format": "glTF 2.0 (.glb)"
+    },
+    {
+      "id": "airpods",
+      "name": "AirPods Pro 2",
+      "tagline": "Adaptive Audio. Now playing.",
+      "sub": "2nd Generation · H2 Chip",
+      "desc": "AirPods Pro feature Adaptive Audio — a new listening mode that seamlessly blends Active Noise Cancellation and Transparency. The H2 chip enables next-level sound quality and personalised Spatial Audio.",
+      "specs": [
+        {"l":"Chip","v":"Apple H2"},
+        {"l":"ANC","v":"Active Noise Cancellation"},
+        {"l":"Audio","v":"Adaptive Transparency"},
+        {"l":"Battery","v":"Up to 30 hours"},
+        {"l":"Charging","v":"MagSafe / Lightning"}
+      ],
+      "model": "models/airpods_pro.glb",
+      "anim": "open lid",
+      "geom": "High detail — 10 meshes, 5 materials",
+      "format": "glTF 2.0 (.glb)"
+    },
+    {
+      "id": "watch",
+      "name": "Apple Watch S7",
+      "tagline": "The watch that watches out for you.",
+      "sub": "Series 7 · 45mm · Midnight Aluminium",
+      "desc": "Apple Watch Series 7 features the largest and most advanced Always-On Retina display yet — with more screen area and thinner borders. The most crack-resistant front crystal on an Apple Watch.",
+      "specs": [
+        {"l":"Display","v":"Always-On Retina"},
+        {"l":"Case","v":"Aluminium / Steel"},
+        {"l":"Size","v":"45mm"},
+        {"l":"Water","v":"50m WR rated"},
+        {"l":"Chip","v":"Apple S7"}
+      ],
+      "model": "models/apple_watch.glb",
+      "anim": "360° spin",
+      "geom": "High detail — 12 meshes, 10 materials",
+      "format": "glTF 2.0 (.glb)"
+    }
+  ]
+}
