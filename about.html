@@ -142,7 +142,7 @@
     <div class="about-card">
       <span class="card-icon">📦</span>
       <div class="card-title">3 original 3D models</div>
-      <div class="card-body">iPhone 15 Pro, AirPods 2nd Generation and Apple Watch Series 7 — each built from scratch in Blender 5.1 with high-detail geometry, multiple material slots, 3-point lighting setups and keyframe animations. Exported as glTF 2.0 (.glb).</div>
+      <div class="card-body">iPhone 15 Pro, AirPods 2nd Generation and Apple Watch Series 7 — each built from scratch in Blender 5.1 with high-detail geometry, multiple material slots, 3-point lighting setups and JavaScript-coded animations. Exported as glTF 2.0 (.glb).</div>
     </div>
     <div class="about-card">
       <span class="card-icon">🎮</span>
@@ -199,8 +199,8 @@
         </div>
         <div class="titem">
           <div class="tstep">Step 05</div>
-          <div class="ttitle">Keyframe animations</div>
-          <div class="tdesc">Each model has product-specific animations baked as keyframes: AirPods lid opens/closes (rotation on X axis, frames 1–30), iPhone screen glow pulses (emission intensity keyframes), Apple Watch performs a 360° showcase rotation (frames 1–60). All triggered via JavaScript onClick buttons.</div>
+          <div class="ttitle">JavaScript-coded animations</div>
+          <div class="tdesc">Each model has product-specific animations triggered via JavaScript onClick buttons: iPhone screen wakes with Dynamic Island pulse and camera flash burst, AirPods lid opens and closes with green LED glow, Apple Watch crown spins with activity rings rotating at different speeds.</div>
         </div>
         <div class="titem">
           <div class="tstep">Step 06</div>
@@ -236,7 +236,7 @@
         <div class="model-card-detail">
           Meshes: 12 separate objects<br>
           Materials: 10 slots — Midnight_Alu, Sport_Band, Watch_Display, Crown_Alu, Crown_Ring + more<br>
-          Animation: 360° rotation showcase<br>
+          Animation: Crown spin with activity rings via JavaScript<br>
           Lights: Key + Fill + Rim · 85mm camera
         </div>
       </div>
@@ -340,7 +340,7 @@
       <tbody>
         <tr><td>Functional</td><td>All control buttons — animate, wireframe, rotate, reset, light, lighting panel, front/side/top camera, info</td><td><span class="pass">Pass</span></td><td>All buttons trigger correct functions</td></tr>
         <tr><td>Functional</td><td>Product tab switching — iPhone → AirPods → Watch</td><td><span class="pass">Pass</span></td><td>Model swaps, bottom bar and info panel update</td></tr>
-        <tr><td>Functional</td><td>3D model animations via Animate button</td><td><span class="pass">Pass</span></td><td>Smooth 360° rotation plays on click</td></tr>
+        <tr><td>Functional</td><td>3D model animations via Animate button</td><td><span class="pass">Pass</span></td><td>iPhone screen wake and flash, AirPods lid opens with LED pulse, Watch crown spins with activity rings</td></tr>
         <tr><td>Functional</td><td>Orbit controls — drag, scroll, right drag to pan</td><td><span class="pass">Pass</span></td><td>Damping and zoom limits working correctly</td></tr>
         <tr><td>Functional</td><td>dat.GUI lighting panel — spotlight colour, intensity, angle, animate</td><td><span class="pass">Pass</span></td><td>All sliders update scene lighting live</td></tr>
         <tr><td>Functional</td><td>Camera presets — front, side, top</td><td><span class="pass">Pass</span></td><td>Camera repositions smoothly to each angle</td></tr>
@@ -379,7 +379,7 @@
     <div class="col-md-6">
       <div class="origin-box">
         <p><strong>Statement of originality</strong></p>
-        <p>This 3D web application was designed and built independently for the University of Sussex 3D Applications module (2026). All 3D models (iPhone 15 Pro, AirPods 2nd Generation, Apple Watch Series 7) were built from scratch in Blender 5.1 using primitive geometry, edge loops, subdivision modifiers, multiple Principled BSDF material slots and keyframe animations.</p>
+        <p>This 3D web application was designed and built independently for the University of Sussex 3D Applications module (2026). All 3D models (iPhone 15 Pro, AirPods 2nd Generation, Apple Watch Series 7) were built from scratch in Blender 5.1 using primitive geometry, edge loops, subdivision modifiers, multiple Principled BSDF material slots and JavaScript-coded animations.</p>
         <p>The website code (HTML5, CSS3, JavaScript, Three.js) was written from scratch implementing a full MVC design pattern with AJAX/JSON data loading, Bootstrap 5 responsive layout and a custom luxury design system.</p>
         <p>Open source libraries used: Three.js r128 (MIT licence), Bootstrap 5.3 (MIT licence), dat.GUI 0.7.9 (Apache 2.0). All sources cited in code comments. This project is for educational purposes only and is not affiliated with Apple Inc.</p>
       </div>
