@@ -238,9 +238,6 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-// ══════════════════════════════════════════
-// MODEL — MVC data layer
-// ══════════════════════════════════════════
 const AppModel = {
   products: [],
   currentId: null,
@@ -263,16 +260,13 @@ const AppModel = {
   },
 
   fallback:[
-    {id:'iphone', name:'iPhone 15 Pro',   tagline:'Titanium. So strong. So light.',  sub:'6.1" · A17 Pro · Titanium',  desc:'The most advanced iPhone ever made. Aerospace-grade titanium design with A17 Pro chip.',  specs:[{l:'Chip',v:'A17 Pro'},{l:'Display',v:'6.1" OLED'},{l:'Material',v:'Titanium'},{l:'Camera',v:'48MP Main'}], model:'models/iphone_15_pro.glb',  anim:'screen glow',   geom:'High detail — 23 meshes', format:'glTF 2.0 (.glb)'},
-    {id:'airpods',name:'AirPods 2nd Generation',   tagline:'Effortless. Magical. Wireless.',     sub:'2nd Gen · H2 Chip',           desc:'AirPods 2nd Generation with H1 chip for faster connection and hands-free Siri.',             specs:[{l:'Chip',v:'Apple H1'},{l:'ANC',v:'Active Noise Cancel'},{l:'Battery',v:'30 hours'},{l:'Case',v:'MagSafe'}],     model:'models/airpods_2nd_gen.glb',   anim:'open lid',      geom:'High detail — 10 meshes', format:'glTF 2.0 (.glb)'},
-    {id:'watch',  name:'Apple Watch S7',  tagline:'The watch that watches for you.', sub:'45mm · Midnight Aluminium',   desc:'Always-on Retina display with surgical-grade aluminium. The most durable Apple Watch.',     specs:[{l:'Display',v:'Always-On Retina'},{l:'Case',v:'Aluminium'},{l:'Size',v:'45mm'},{l:'Water',v:'50m resist'}],    model:'models/apple_watch.glb',   anim:'360° spin',     geom:'High detail — 12 meshes', format:'glTF 2.0 (.glb)'}
+    {id:'iphone', name:'iPhone 15 Pro', tagline:'Titanium. So strong. So light.', sub:'6.1" · A17 Pro · Titanium', desc:'The most advanced iPhone ever made. Aerospace-grade titanium design with A17 Pro chip.', specs:[{l:'Chip',v:'A17 Pro'},{l:'Display',v:'6.1" OLED'},{l:'Material',v:'Titanium'},{l:'Camera',v:'48MP Main'}], model:'models/iphone_15_pro.glb', anim:'screen wake & flash', geom:'High detail — 23 meshes', format:'glTF 2.0 (.glb)'},
+    {id:'airpods', name:'AirPods 2nd Generation', tagline:'Effortless. Magical. Wireless.', sub:'2nd Gen · H1 Chip', desc:'AirPods 2nd Generation with H1 chip for faster connection and hands-free Siri.', specs:[{l:'Chip',v:'Apple H1'},{l:'Battery',v:'Up to 5 hours'},{l:'Total',v:'24+ hours'},{l:'Charging',v:'Lightning'}], model:'models/airpods_2nd_gen.glb', anim:'case lid open', geom:'High detail — 10 meshes', format:'glTF 2.0 (.glb)'},
+    {id:'watch', name:'Apple Watch Series 7', tagline:'The watch that watches for you.', sub:'45mm · Midnight Aluminium', desc:'Always-on Retina display with surgical-grade aluminium. The most durable Apple Watch.', specs:[{l:'Display',v:'Always-On Retina'},{l:'Case',v:'Aluminium'},{l:'Size',v:'45mm'},{l:'Water',v:'50m resist'}], model:'models/apple_watch.glb', anim:'crown spin & rings', geom:'High detail — 12 meshes', format:'glTF 2.0 (.glb)'}
   ],
   get(id){return this.products.find(p=>p.id===id);}
 };
 
-// ══════════════════════════════════════════
-// VIEW — MVC presentation layer
-// ══════════════════════════════════════════
 const AppView = {
   buildTabs(products){
     const icons={iphone:'📱',airpods:'🎧',watch:'⌚'};
@@ -281,10 +275,8 @@ const AppView = {
     ).join('');
   },
   updateInfo(p){
-    // bottom bar
     document.getElementById('bottom-name').textContent=p.name;
     document.getElementById('bottom-anim').textContent=p.anim||'';
-    // side panel
     document.getElementById('p-name').textContent=p.name;
     document.getElementById('p-sub').textContent=p.tagline||p.sub;
     document.getElementById('p-desc').textContent=p.desc;
@@ -310,9 +302,6 @@ const AppView = {
   resetPills(){['btn-wire','btn-rotate','btn-spot','btn-gui','btn-info'].forEach(id=>AppView.pill(id,false));}
 };
 
-// ══════════════════════════════════════════
-// CONTROLLER — MVC logic layer
-// ══════════════════════════════════════════
 const AppController = {
   init(){
     this._three();
@@ -392,20 +381,27 @@ const AppController = {
     const af=gui.addFolder('Ambient');
     af.add(gp,'ambientInt',0,3).name('Intensity').onChange(v=>{AppModel.lights.ambient.intensity=v;});
   },
-
-  switch(id){
+switch(id){
     if(id===AppModel.currentId)return;
     AppModel.currentId=id;
     const p=AppModel.get(id);
     if(!p)return;
     AppView.setTab(id);
     AppView.updateInfo(p);
-    AppView.resetPills();
+    AppModel._animRunning=false;
+    if(AppModel.state.spotOn){
+      AppModel.state.spotOn=false;
+      AppModel.gp.spotOn=false;
+      AppModel.lights.spot.intensity=0;
+    }
+    if(AppModel.state.guiVisible){
+      AppModel.state.guiVisible=false;
+      AppModel.gui.domElement.style.display='none';
+    }
     AppModel.state.wire=false;
     AppModel.state.rotating=false;
     AppModel.controls.autoRotate=false;
-    document.getElementById('btn-wire').classList.remove('active-dark');
-    document.getElementById('btn-rotate').classList.remove('active-dark');
+    AppView.resetPills();
     this._load(p.model);
   },
 
@@ -422,8 +418,20 @@ const AppController = {
       const scale=3/Math.max(size.x,size.y,size.z);
       m.scale.setScalar(scale);
       m.position.sub(centre.multiplyScalar(scale));
-      m.castShadow=true; m.receiveShadow=true;
+      m.traverse(o=>{
+        if(o.isMesh){
+          o.castShadow=true;
+          o.receiveShadow=true;
+          const mats=Array.isArray(o.material)?o.material:[o.material];
+          mats.forEach(mat=>{
+            if(!mat)return;
+            mat.envMapIntensity=1.3;
+            if(!mat.emissive)mat.emissive=new THREE.Color(0x000000);
+          });
+        }
+      });
       AppModel.scene.add(m);
+      AppModel.loadedModel=m;
       AppModel.loadedModel=m;
       if(gltf.animations&&gltf.animations.length){
         AppModel.mixer=new THREE.AnimationMixer(m);
@@ -447,7 +455,7 @@ const AppController = {
     });
   },
 
- playAnim(){
+  playAnim(){
     if(AppModel.actions.length){
       const a=AppModel.actions[0];
       if(a.isRunning()){a.stop();}
@@ -458,8 +466,6 @@ const AppController = {
       const model=AppModel.loadedModel;
       const meshes={};
       model.traverse(function(c){if(c.isMesh)meshes[c.name]=c;});
-
-      // Watch animation: crown spin + rings fill + screen pulse
       if(meshes['Crown']){
         let t=0;
         const crown=meshes['Crown'];
@@ -486,7 +492,6 @@ const AppController = {
             AppModel._animRunning=false;
           }
         },16);
-
       } else if(meshes['iPhone_Screen']){
         let t=0;
         const screen=meshes['iPhone_Screen'];
@@ -494,8 +499,6 @@ const AppController = {
         const flash=meshes['iPhone_Flash'];
         const led1=meshes['iPhone_FlashLED1'];
         const led2=meshes['iPhone_FlashLED2'];
-
-        // set up emission on screen
         if(screen&&screen.material){
           screen.material.emissive=new THREE.Color(0x88bbff);
           screen.material.emissiveIntensity=0;
@@ -510,28 +513,15 @@ const AppController = {
             m.material.emissiveIntensity=0;
           }
         });
-
         const id=setInterval(function(){
           t+=0.03;
-
-          // screen fade in then out
-          if(screen&&screen.material){
-            screen.material.emissiveIntensity=Math.sin(t)*1.2;
-          }
-
-          // dynamic island pulse slightly later
-          if(island&&island.material){
-            island.material.emissiveIntensity=Math.sin(t+0.5)*0.8;
-          }
-
-          // flash burst at peak
+          if(screen&&screen.material)screen.material.emissiveIntensity=Math.sin(t)*1.2;
+          if(island&&island.material)island.material.emissiveIntensity=Math.sin(t+0.5)*0.8;
           const flashBurst=t>1.2&&t<1.6?2.5:0;
           [flash,led1,led2].forEach(function(m){
             if(m&&m.material)m.material.emissiveIntensity=flashBurst;
           });
-
           if(t>Math.PI){
-            // reset all
             if(screen&&screen.material)screen.material.emissiveIntensity=0;
             if(island&&island.material)island.material.emissiveIntensity=0;
             [flash,led1,led2].forEach(function(m){
@@ -548,19 +538,19 @@ const AppController = {
         const led=meshes['AirPods_LED'];
         const earL=meshes['AirPods_Earbud_L_head'];
         const earR=meshes['AirPods_Earbud_R_head'];
-
+        const stemL=meshes['AirPods_Earbud_L_stem'];
+        const stemR=meshes['AirPods_Earbud_R_stem'];
+        const grilleL=meshes['AirPods_Earbud_L_grille'];
+        const grilleR=meshes['AirPods_Earbud_R_grille'];
         const lidStart=lid.rotation.x;
         const earLStart=earL?earL.position.y:0;
         const earRStart=earR?earR.position.y:0;
-
         if(led&&led.material){
           led.material.emissive=new THREE.Color(0x00ff44);
           led.material.emissiveIntensity=0;
         }
-
         const id=setInterval(function(){
           t+=0.025;
-
           if(t<=Math.PI){
             const progress=Math.sin(t/2);
             lid.rotation.x=lidStart-(Math.PI*0.75*progress);
@@ -568,8 +558,11 @@ const AppController = {
             if(led&&led.material)led.material.emissiveIntensity=progress*1.5;
             if(earL)earL.position.y=earLStart+(progress*0.15);
             if(earR)earR.position.y=earRStart+(progress*0.15);
+            if(stemL)stemL.position.y=earLStart+(progress*0.15);
+            if(stemR)stemR.position.y=earRStart+(progress*0.15);
+            if(grilleL)grilleL.position.y=earLStart+(progress*0.15);
+            if(grilleR)grilleR.position.y=earRStart+(progress*0.15);
           }
-
           if(t>Math.PI*1.5&&t<=Math.PI*2.5){
             const progress=Math.sin((t-Math.PI*1.5)/2);
             lid.rotation.x=lidStart-(Math.PI*0.75*(1-progress));
@@ -577,25 +570,31 @@ const AppController = {
             if(led&&led.material)led.material.emissiveIntensity=(1-progress)*1.5;
             if(earL)earL.position.y=earLStart+((1-progress)*0.15);
             if(earR)earR.position.y=earRStart+((1-progress)*0.15);
+            if(stemL)stemL.position.y=earLStart+((1-progress)*0.15);
+            if(stemR)stemR.position.y=earRStart+((1-progress)*0.15);
+            if(grilleL)grilleL.position.y=earLStart+((1-progress)*0.15);
+            if(grilleR)grilleR.position.y=earRStart+((1-progress)*0.15);
           }
-
           if(t>Math.PI*2.5){
             lid.rotation.x=lidStart;
             if(hinge)hinge.rotation.x=lidStart;
             if(led&&led.material)led.material.emissiveIntensity=0;
             if(earL)earL.position.y=earLStart;
             if(earR)earR.position.y=earRStart;
+            if(stemL)stemL.position.y=earLStart;
+            if(stemR)stemR.position.y=earRStart;
+            if(grilleL)grilleL.position.y=earLStart;
+            if(grilleR)grilleR.position.y=earRStart;
             clearInterval(id);
             AppModel._animRunning=false;
           }
         },16);
-
-      } else {
-        // fallback gentle float
-        let t=0;const sy=model.scale.y;
+     } else {
+        let t=0;const startY=model.rotation.y;
         const id=setInterval(function(){
-          t+=.08;model.scale.y=sy*(1+Math.sin(t)*.08);
-          if(t>Math.PI*2){model.scale.y=sy;clearInterval(id);AppModel._animRunning=false;}
+          t+=0.04;
+          model.rotation.y=startY+t*2;
+          if(t>Math.PI){model.rotation.y=startY;clearInterval(id);AppModel._animRunning=false;}
         },16);
       }
     }
@@ -650,5 +649,3 @@ const AppController = {
 
 AppController.init();
 </script>
-</body>
-</html>
