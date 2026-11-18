@@ -29,7 +29,7 @@ Blender source files (`.blend`) for each model are in `models/`. Product details
 
 ## Running locally
 
-The viewer loads the models and `products.json` over HTTP, so serve the folder over HTTP instead of opening the files directly:
+The viewer loads the models and `products.json` with web requests, so serve the folder over HTTP instead of opening the files directly:
 
 ```bash
 python -m http.server 8000
